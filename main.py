@@ -9,6 +9,8 @@ database.db.connect()
 database.db.create_tables([models.Paciente, models.Medico])
 database.db.close()
 
+TOKEN_KEY = ''
+
 app = FastAPI()
 
 app.include_router(
