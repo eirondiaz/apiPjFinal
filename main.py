@@ -1,9 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends
-import jwt
-from sql_app import database, models, shemas
-from dependencies.database import get_db
-from routers import medic, patient,authentication
-
+from fastapi import FastAPI
+from routers import doctor, patient,authentication
+from sql_app import database, models
 
 database.db.connect()
 database.db.create_tables([models.Paciente, models.Medico])
@@ -20,9 +17,9 @@ app.include_router(
     responses={404: {"description": "Not found"}},
 )
 app.include_router(
-    medic.router,
-    prefix="/medic",
-    tags=["medic"],
+    doctor.router,
+    prefix="/doctor",
+    tags=["doctor"],
     responses={404: {"description": "Not found"}},
 )
 app.include_router(
