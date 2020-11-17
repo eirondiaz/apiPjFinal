@@ -18,18 +18,6 @@ def create_paciente(token: str, pac: shemas.Patient):
         data = jwt.decode(token, TOKEN_KEY)
         try:
             med = models.Medico.get(models.Medico.id == data['id'])
-            '''paciente = Paciente.create(
-                        cedula = pac.cedula,
-                        nombre = pac.nombre,
-                        apellido = pac.apellido,
-                        sexo = pac.sexo,
-                        foto = pac.foto,
-                        tipo_sangre = pac.tipo_sangre,
-                        email = pac.email,
-                        fecha_nac = pac.fecha_nac,
-                        alergias = pac.alergias,
-                        medico = med
-                        )'''
             paciente = models.Paciente.create(**pac.dict(), medico = med)
             return {'ok': True, 'msg': 'paciente registrado'}
         except:
@@ -47,11 +35,10 @@ def create_paciente(token: str, pac: shemas.Patient):
 def get_all_patient(token: str):
     try:
         data = jwt.decode(token, TOKEN_KEY)
-        query = models.Paciente.select(models.Paciente).join
-        (models.Medico).where(models.Medico.id == data['id'])
+        query = models.Paciente.select(models.Paciente).join(models.Medico).where(models.Medico.id == data['id'])
         pacienteList = []
         for pac in query:
-            pacienteList.append(pac._data_)
+            pacienteList.append(pac.__data__)
 
         return {'ok': True, 'pacientes': pacienteList}
     except jwt.exceptions.DecodeError:
@@ -69,3 +56,27 @@ def get_pac_by_id(id: int):
         return {'ok': True, 'paciente': pac}
     else:
         return {'ok': False, 'msg': 'no existe usuario'}
+
+#ELIMINAR PACIENTE
+@router.delete(
+    '/{id}',
+    dependencies=[Depends(get_db)]
+)
+def delete_pac(id: str):
+    dela = models.Paciente.delete().where(models.Paciente.id == id).execute()
+    if dela == 1:
+        return {'ok': True, 'msg': 'paciente eliminado'}
+    elif dela == 0:
+        return {'ok': False, 'msg': 'no existe paciente con ese id'}
+
+#EDITAR PACIENTE
+@router.put(
+    '/{id}',
+    dependencies=[Depends(get_db)]
+)
+def update_pac(id: str, pac: shemas.Patient):
+    updated = models.Paciente.update(**pac.dict()).where(models.Paciente.id == id).execute()
+    if updated == 1:
+        return {'ok': True, 'msg': 'paciente editado'}
+    elif updated == 0:
+        return {'ok': False, 'msg': 'error'}
