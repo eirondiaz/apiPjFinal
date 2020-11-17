@@ -1,10 +1,18 @@
 from pydantic import BaseModel
 from typing import Optional  
 
-class Medic(BaseModel):
-    nombre: Optional[str] = None
-    correo: Optional[str] = None
+class MedicClave(BaseModel):
     clave: Optional[str] = None
+
+class MedicCorreo(BaseModel):
+    correo: Optional[str] = None
+
+class Medic(MedicClave, MedicCorreo):
+    nombre: Optional[str] = None
+   
+class MedicLogin(MedicClave, MedicCorreo):
+    pass
+
 
 class Patient(BaseModel):
     cedula: Optional[str] = None

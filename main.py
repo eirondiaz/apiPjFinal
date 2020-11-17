@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 import jwt
 from sql_app import database, models, shemas
 from dependencies.database import get_db
-from routers import medic, patient
+from routers import medic, patient,authentication
 
 
 database.db.connect()
@@ -13,6 +13,12 @@ TOKEN_KEY = ''
 
 app = FastAPI()
 
+app.include_router(
+    authentication.router,
+    prefix="/authentication",
+    tags=["authentication"],
+    responses={404: {"description": "Not found"}},
+)
 app.include_router(
     medic.router,
     prefix="/medic",
