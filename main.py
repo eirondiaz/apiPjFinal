@@ -3,9 +3,13 @@ from pydantic import BaseModel
 from typing import Optional
 from peewee import SqliteDatabase, Model, IntegerField, CharField, DateTimeField, ForeignKeyField, IntegrityError
 import jwt
-from Models import paciente, medico
 
 db = SqliteDatabase('prueba.db')
+
+class Medic(BaseModel):
+    nombre: Optional[str] = None
+    correo: Optional[str] = None
+    clave: Optional[str] = None
 
 class Medico(Model):
     id = IntegerField(primary_key=True)
@@ -15,6 +19,17 @@ class Medico(Model):
 
     class Meta:
         database = db
+
+class Patient(BaseModel):
+    cedula: Optional[str] = None
+    nombre: Optional[str] = None
+    apellido: Optional[str] = None
+    foto: Optional[str] = None
+    tipo_sangre: Optional[str] = None
+    email: Optional[str] = None
+    sexo: Optional[str] = None
+    fecha_nac: Optional[str] = None
+    alergias: Optional[str] = None
 
 class Paciente(Model):
     id = IntegerField(primary_key=True)
@@ -36,9 +51,6 @@ db.connect()
 db.create_tables([Medico, Paciente])
 
 TOKEN_KEY = ''
-
-Medic = medico.Medic
-Patient = paciente.Patient
 
 app = FastAPI()
 
