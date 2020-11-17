@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from peewee import SqliteDatabase, Model, IntegerField, CharField, DateTimeField, ForeignKeyField
+from peewee import SqliteDatabase, Model, IntegerField, CharField, DateTimeField, ForeignKeyField, IntegrityError
 import jwt
 
 db = SqliteDatabase('prueba.db')
@@ -50,27 +50,65 @@ class Paciente(Model):
 db.connect()
 db.create_tables([Medico, Paciente])
 
+TOKEN_KEY = ''
+
 app = FastAPI()
 
 @app.get('/')
 def home():
-    return 'funciona'
+    return 'api para el proyecto final de Prog Web'
 
-#metodos de medico
+#funciones de medico
+#REGISTRO DE MEDICO
 @app.post('/medico')
-def create_medico(med: Medic):
+def registrar(med: Medic):
     try:
-        medico = Medic(nombre = med.nombre, correo = med.correo, clave = med.clave)
+        medico = Medico(nombre = med.nombre, correo = med.correo, clave = med.clave)
         medico.save()
         return {'ok': True, 'msg': 'medico agregado'}
     except:
-        raise HTTPException(status_code = 400, detail='ha ocurrido un error')
+        raise HTTPException(status_code = 400, detail='error')
 
-#metodos de paciente
+#LOGIN DE MEDICO
+@app.post('/medico/login')
+def login(med: Medic):
+    medico = Medico.get_or_none(Medico.correo == med.correo and Medico.clave == med.clave)
+    if medico == None:
+        return {'ok': False, 'msg': 'correo o clave invalido'}
+    else:
+        token = jwt.encode({'id': medico.id}, TOKEN_KEY)
+        return {'ok': True, 'token': token}
+
+#funciones de paciente
+#OBTENER TODOS LOS PACIENTES
+@app.get('/paciente')
+def get_all_patient(token: str):
+    try:
+        data = jwt.decode(token, TOKEN_KEY)
+
+        query = Paciente.select(Paciente).join(Medico).where(Medico.id == data['id'])
+        pacienteList = []
+        for pac in query:
+            pacienteList.append(pac.__data__)
+
+        return {'ok': True, 'pacientes': pacienteList}
+    except jwt.exceptions.DecodeError:
+        return {'ok': False, 'msg': 'token invalido'}
+
+#OBTENER PACIENTE POR ID
+@app.get('/paciente/{id}')
+def get_pac_by_id(id: str):
+    pac = Paciente.get_or_none(Paciente.id == id)
+    if pac == None:
+        return {'ok': True, 'paciente': pac.__data__}
+    else:
+        return {'ok': False, 'msg': 'no existe usuario'}
+
+#CREAR PACIENTE
 @app.post('/paciente')
 def create_paciente(token: str, pac: Patient):
     try:
-        data = jwt.decode(token, '''aqui va el key''')
+        data = jwt.decode(token, TOKEN_KEY)
         try:
             med = Medico.get(Medico.id == data['id'])
             '''paciente = Paciente.create(
