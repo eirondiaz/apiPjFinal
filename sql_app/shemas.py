@@ -38,3 +38,7 @@ class Consult(BaseModel):
     no_seguro: Optional[str] = None
     diagnostico: Optional[str] = None
     foto_evidencia: Optional[str] = None
+
+class ConsultCreate(Consult):
+    id_paciente:int
+    pass

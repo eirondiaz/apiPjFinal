@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException, Depends
-from sql_app import database, models, shemas
+from sql_app import database, models, shemas, crud
 from dependencies.database import get_db
+from dependencies.authentication import get_current_user_db_with_token
 from fastapi import APIRouter
+from starlette import status
 from utils.token import Token
+from resources import strings
 
 router = APIRouter()
 
@@ -55,3 +58,19 @@ def delete_consulta(id: str):
         return {'ok': True, 'msg': 'consulta eliminada'}
     elif dela == 0:
         return {'ok': False, 'msg': 'error'}
+
+
+@router.post(
+    '/create',
+    dependencies=[Depends(get_db)])
+def create_cosulta(consulta:shemas.ConsultCreate, token:str):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    try:
+        crud.create_consulta(consulta, id_doctor=current_user.id)
+        return {'ok': True, 
+                'msg': strings.CREATED}
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail= strings.CONSULT_NOT_CREATED 
+            )

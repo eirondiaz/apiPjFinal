@@ -15,4 +15,12 @@ def update_email_name_doctor(id:int, doctor_name_email:shemas.MedicNombreCorreo)
     docotor_udated =  models.Medico.update(
         **doctor_name_email.dict()).where(models.Medico.id == id).execute()
     return docotor_udated
+
+
+#sectio cosulta-----------------------------------------------------------------------------------
+
+def create_consulta(consulta: shemas.ConsultCreate, id_doctor:int):
+    models.Consulta.create(**consulta.dict(), 
+                           medico= id_doctor, 
+                           paciente= consulta.id_paciente)
     
