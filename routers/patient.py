@@ -53,7 +53,7 @@ def get_all_patient(token: str):
 def get_pac_by_id(id: int):
     pac = models.Paciente.get_or_none(models.Paciente.id == id)
     if pac:
-        return {'ok': True, 'paciente': pac}
+        return {'ok': True, 'paciente': pac.__data__}
     else:
         return {'ok': False, 'msg': 'no existe usuario'}
 

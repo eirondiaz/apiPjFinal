@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from routers import doctor, patient,authentication
+from routers import doctor, patient,authentication, consulta
 from sql_app import database, models
 
 database.db.connect()
-database.db.create_tables([models.Paciente, models.Medico])
+database.db.create_tables([models.Paciente, models.Medico, models.Consulta])
 database.db.close()
 
 TOKEN_KEY = ''
@@ -28,7 +28,13 @@ app.include_router(
     tags=["patient"],
     responses={404: {"description": "Not found"}},
 )
+app.include_router(
+    consulta.router,
+    prefix="/consulta",
+    tags=["consulta"],
+    responses={404: {"description": "Not found"}},
+)
 
 @app.get('/')
 def home():
-    return 'funciona'
+    return 'api del proyecto final de Prog Web'
