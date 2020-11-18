@@ -30,3 +30,11 @@ class Patient(BaseModel):
     sexo: Optional[str] = None
     fecha_nac: Optional[str] = None
     alergias: Optional[str] = None
+
+class Consult(BaseModel):
+    nota: Optional[str] = None
+    monto: Optional[str] = None
+    motivo: Optional[str] = None
+    no_seguro: Optional[str] = None
+    diagnostico: Optional[str] = None
+    foto_evidencia: Optional[str] = None

@@ -23,7 +23,7 @@ def update_password(doctor:shemas.MedicClave,token:str):
     else: 
        raise HTTPException(
            status_code=status.HTTP_304_NOT_MODIFIED,
-           etail=strings.DOCTOR_NOT_UPDATED)
+           detail=strings.DOCTOR_NOT_UPDATED)
 
 
 @router.put(
@@ -46,4 +46,4 @@ def update_password(doctor:shemas.MedicNombreCorreo,token:str):
     else: 
        raise HTTPException(
            status_code=status.HTTP_304_NOT_MODIFIED,
-           etail=strings.DOCTOR_NOT_UPDATED)
+           detail=strings.DOCTOR_NOT_UPDATED)

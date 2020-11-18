@@ -1,5 +1,6 @@
 import peewee
 from .database import db
+from datetime import datetime
 
         
 class Medico(peewee.Model):
@@ -23,6 +24,21 @@ class Paciente(peewee.Model):
     fecha_nac = peewee.CharField()
     alergias = peewee.CharField()
     medico = peewee.ForeignKeyField(Medico)
+
+    class Meta:
+        database = db
+
+class Consulta(peewee.Model):
+    id = peewee.IntegerField(primary_key=True)
+    nota = peewee.CharField()
+    monto = peewee.CharField()
+    fecha = peewee.DateTimeField(default=datetime.now())
+    motivo = peewee.CharField()
+    no_seguro = peewee.CharField()
+    diagnostico = peewee.CharField()
+    foto_evidencia = peewee.CharField()
+    medico = peewee.ForeignKeyField(Medico)
+    paciente = peewee.ForeignKeyField(Paciente)
 
     class Meta:
         database = db
