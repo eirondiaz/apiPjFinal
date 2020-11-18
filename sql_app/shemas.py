@@ -6,10 +6,16 @@ class MedicClave(BaseModel):
 
 class MedicCorreo(BaseModel):
     correo: Optional[str] = None
-
-class Medic(MedicClave, MedicCorreo):
+    
+class MedicNombre(BaseModel):
     nombre: Optional[str] = None
-   
+
+class Medic(MedicClave, MedicCorreo, MedicNombre):
+    pass
+
+class MedicNombreCorreo(MedicNombre, MedicCorreo):
+    pass
+
 class MedicLogin(MedicClave, MedicCorreo):
     pass
 
