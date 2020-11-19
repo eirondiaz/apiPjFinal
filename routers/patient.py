@@ -1,14 +1,36 @@
 from fastapi import FastAPI, HTTPException, Depends
 import jwt
-from sql_app import database, models, shemas
+from sql_app import database, models, shemas, crud
 from dependencies.database import get_db
+from dependencies.authentication import get_current_user_db_with_token
 from fastapi import APIRouter
+from resources import strings
+from starlette import status
 
 TOKEN_KEY = ''
 
 router = APIRouter()
 
 #metodos de paciente
+
+#TODO
+@router.get('/totalVisits', dependencies=[Depends(get_db)])
+def get_total_visits(id_doctor):
+    #THIS CODE IS GOINT TO IMPLEMENT LATER
+    """ current_user:models.Medico = get_current_user_db_with_token(token)
+    patients = crud.get_patients_total_visists_by_doctor(current_user.id) """
+    patients:list = crud.get_patients_total_visists_by_doctor(id_doctor)
+    if not patients:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=strings.NOT_PATIENTS
+        )
+    return{'ok': True, 
+           'msg':strings.SUCCESS,
+          'patients':patients}
+
+#---------------------------------------------------------------------------------------------------
+
 @router.post(
     '/create',
     dependencies=[Depends(get_db)]
@@ -80,3 +102,4 @@ def update_pac(id: str, pac: shemas.Patient):
         return {'ok': True, 'msg': 'paciente editado'}
     elif updated == 0:
         return {'ok': False, 'msg': 'error'}
+

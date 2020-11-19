@@ -62,7 +62,8 @@ def delete_consulta(id: str):
 
 @router.post(
     '/create',
-    dependencies=[Depends(get_db)])
+    dependencies=[Depends(get_db)]
+    )
 def create_cosulta(consulta:shemas.ConsultCreate, token:str):
     current_user:models.Medico = get_current_user_db_with_token(token)
     try:
@@ -74,3 +75,4 @@ def create_cosulta(consulta:shemas.ConsultCreate, token:str):
             status_code=status.HTTP_409_CONFLICT,
             detail= strings.CONSULT_NOT_CREATED 
             )
+        
