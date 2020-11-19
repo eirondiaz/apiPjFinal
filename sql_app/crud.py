@@ -1,5 +1,6 @@
 from . import models, shemas
 from peewee import fn, SQL
+from datetime import datetime
 
 #sectio doctor-----------------------------------------------------------------------------------
 
@@ -26,17 +27,27 @@ def create_consulta(consulta: shemas.ConsultCreate, id_doctor:int):
                            paciente= consulta.id_paciente)
   
 #sectio patients-----------------------------------------------------------------------------------
-#TODO
+
 def get_patients_total_visists_by_doctor(id_doctor:int):
     query = models.Paciente.select(
     models.Paciente,models.Consulta.select(
         fn.Count(models.Consulta).alias('_total_')).where(
             models.Consulta.paciente == models.Paciente.id)
     ).where(models.Paciente.medico ==id_doctor)
-    pacients:list = []
+    patients:list = []
     i = 0
-    for pac in query:
-        pacients.append(pac.__data__)
-        pacients[i]['total_visit'] = pac.t3
+    for pat in query:
+        patients.append(pat.__data__)
+        patients[i]['total_visit'] = pat.t3
         i = i +1  
-    return pacients
+    return patients
+
+
+def get_patients_by_date_by_doctor(id_doctor:int, birthdate:datetime):
+    query = models.Paciente.select(
+        models.Paciente).where(models.Paciente.fecha_nac==birthdate 
+                               and models.Paciente.medico== id_doctor)
+    patients:list = []
+    for pat in query:
+        patients.append(pat.__data__)
+    return patients

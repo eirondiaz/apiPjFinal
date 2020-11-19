@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from typing import Optional  
+from typing import Optional 
+from datetime import datetime 
 
 class MedicClave(BaseModel):
     clave: Optional[str] = None
@@ -20,7 +21,10 @@ class MedicLogin(MedicClave, MedicCorreo):
     pass
 
 
-class Patient(BaseModel):
+class PatientFechaNacimiento(BaseModel):
+    fecha_nac: Optional[datetime] = None
+
+class Patient(PatientFechaNacimiento):
     cedula: Optional[str] = None
     nombre: Optional[str] = None
     apellido: Optional[str] = None
@@ -28,8 +32,8 @@ class Patient(BaseModel):
     tipo_sangre: Optional[str] = None
     email: Optional[str] = None
     sexo: Optional[str] = None
-    fecha_nac: Optional[str] = None
     alergias: Optional[str] = None
+
 
 class Consult(BaseModel):
     nota: Optional[str] = None

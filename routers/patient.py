@@ -6,6 +6,7 @@ from dependencies.authentication import get_current_user_db_with_token
 from fastapi import APIRouter
 from resources import strings
 from starlette import status
+from datetime import datetime
 
 TOKEN_KEY = ''
 
@@ -14,12 +15,31 @@ router = APIRouter()
 #metodos de paciente
 
 #TODO
-@router.get('/totalVisits', dependencies=[Depends(get_db)])
+@router.get(
+    '/getBytotalVisits', 
+    dependencies=[Depends(get_db)]
+    )
 def get_total_visits(id_doctor):
     #THIS CODE IS GOINT TO IMPLEMENT LATER
     """ current_user:models.Medico = get_current_user_db_with_token(token)
     patients = crud.get_patients_total_visists_by_doctor(current_user.id) """
     patients:list = crud.get_patients_total_visists_by_doctor(id_doctor)
+    if not patients:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=strings.NOT_PATIENTS
+        )
+    return{'ok': True, 
+           'msg':strings.SUCCESS,
+          'patients':patients}
+    
+#TODO
+@router.get('/getByBirthdate/{patiente_birthdate}',dependencies=[Depends(get_db)])
+def get_patients_by_birthdate(id_doctor, patiente_birthdate:datetime):
+    #THIS CODE IS GOINT TO IMPLEMENT LATER
+    """ current_user:models.Medico = get_current_user_db_with_token(token)
+    patients = crud.get_patients_total_visists_by_doctor(current_user.id) """
+    patients:list = crud.get_patients_by_date_by_doctor(id_doctor, patiente_birthdate)
     if not patients:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

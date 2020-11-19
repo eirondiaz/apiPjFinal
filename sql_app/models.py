@@ -21,7 +21,7 @@ class Paciente(peewee.Model):
     tipo_sangre = peewee.CharField()
     email = peewee.CharField()
     sexo = peewee.CharField()
-    fecha_nac = peewee.CharField()
+    fecha_nac = peewee.DateTimeField(default=datetime.now())
     alergias = peewee.CharField()
     medico = peewee.ForeignKeyField(Medico)
 
