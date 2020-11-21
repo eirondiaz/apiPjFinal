@@ -1,12 +1,23 @@
 from fastapi import FastAPI
 from routers import doctor, patient,authentication, consulta
 from sql_app import database, models
+from fastapi.middleware.cors import CORSMiddleware
 
 database.db.connect()
 database.db.create_tables([models.Paciente, models.Medico, models.Consulta])
 database.db.close()
 
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def routers(file, prefix:str, tags:str):
     app.include_router(
