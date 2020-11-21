@@ -6,6 +6,7 @@ from fastapi import APIRouter
 from starlette import status
 from utils.token import Token
 from resources import strings
+from sql_app.shemas import ServerResponse
 
 router = APIRouter()
 
@@ -14,51 +15,65 @@ router = APIRouter()
     '/',
     dependencies=[Depends(get_db)]
 )
-def get_all_consultas(tokenn: str):
-    data = Token().decode(tokenn)
-    query = models.Consulta.select(models.Consulta, models.Paciente).join(models.Medico).where(models.Medico.id == data['id'])
-    consultList = []
-    for con in query:
-        consultList.append(con.__data__)
+def get_all_consultas(token: str):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    query = models.Consulta.get_or_none(models.Consulta.medico == current_user.id)
+    if not query:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+                      detail=strings.NOT_COLSULTS)
+    return ServerResponse(msg=strings.SUCCESS,data= query.__data__)
 
-    return {'ok': True, 'consultas': consultList}
 
 #OBTENER CONSULTA POR ID
 @router.get(
     '/{id}',
     dependencies=[Depends(get_db)]
 )
-def get_consulta_by_id(id: str):
-    query = models.Consulta.get_or_none(models.Consulta.id == id)
-    if query == None:
-        return {'ok': False, 'msg': 'consulta no encontrada'}
+def get_consulta_by_id(id: int, token):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    consult = crud.get_consulta_by_id_by_doctor(current_user.id, id)
+    if not consult:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail= strings.CONSULT_NOT_FOUND)
     else:
-        return {'ok': True, 'consulta': query.__data__}
+        return ServerResponse(msg=strings.SUCCESS, data=consult.__data__)
+
 
 #EDITAR CONSULTA
 @router.put(
-    '/{id}',
+    '/{id_consult}',
     dependencies=[Depends(get_db)]
 )
-def edit_consulta(id: str, con: shemas.Consult):
-    edited = models.Consulta.update(**con.dict()).where(models.Consulta.id == id).execute()
+def edit_consulta(id_consult,con: shemas.Consult, token):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    edited = models.Consulta.update(**con.dict()).where(
+        models.Consulta.id == id_consult, models.Consulta.medico==current_user.id
+        ).execute()
     if edited == 1:
-        return {'ok': True, 'msg': 'consulta editada'}
-    elif edited == 0:
-        return {'ok': False, 'msg': 'error'}
+        return ServerResponse(msg=strings.CONSULT_UPDATED)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=strings.COULD_NOT_UPDATE)
 
 #ELIMINAR CONSULTA
 @router.delete(
-    '/{id}',
+    '/{id_consult}',
     dependencies=[Depends(get_db)]
 )
-def delete_consulta(id: str):
-    dela = models.Consulta.delete().where(models.Consulta.id == id).execute()
+def delete_consulta(id_consult: str, token):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    dela = models.Consulta.delete().where(
+        models.Consulta.id == id_consult,
+        models.Consulta.medico==current_user.id).execute()
     if dela == 1:
-        return {'ok': True, 'msg': 'consulta eliminada'}
-    elif dela == 0:
-        return {'ok': False, 'msg': 'error'}
-
+        return ServerResponse(msg=strings.CONSULT_DELETED)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=strings.COULD_NOT_DELETE)
 
 @router.post(
     '/create',
@@ -68,8 +83,7 @@ def create_cosulta(consulta:shemas.ConsultCreate, token:str):
     current_user:models.Medico = get_current_user_db_with_token(token)
     try:
         crud.create_consulta(consulta, id_doctor=current_user.id)
-        return {'ok': True, 
-                'msg': strings.CREATED}
+        return ServerResponse(msg=strings.CREATED)
     except:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

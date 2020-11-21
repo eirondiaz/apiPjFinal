@@ -14,7 +14,7 @@ class Medico(peewee.Model):
         
 class Paciente(peewee.Model):
     id = peewee.IntegerField(primary_key=True)
-    cedula = peewee.CharField(unique=True)
+    cedula = peewee.CharField(index=True)
     nombre = peewee.CharField()
     apellido = peewee.CharField()
     foto = peewee.CharField()

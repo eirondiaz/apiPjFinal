@@ -5,8 +5,12 @@ from datetime import datetime
 #sectio doctor-----------------------------------------------------------------------------------
 
 #this is the doctor
+#not implemet yet
 def get_user_by_id(id:int):
     return models.Medico.get_or_none(models.Medico.id==id)
+
+def get_user_by_email(email:str):
+    return models.Medico.get_or_none(models.Medico.correo==email)
 
 def update_password_doctor(id:int, doctor_password:shemas.MedicClave):
     docotor_udated =  models.Medico.update(
@@ -18,13 +22,17 @@ def update_email_name_doctor(id:int, doctor_name_email:shemas.MedicNombreCorreo)
         **doctor_name_email.dict()).where(models.Medico.id == id).execute()
     return docotor_udated
 
-
 #sectio cosulta-----------------------------------------------------------------------------------
 
 def create_consulta(consulta: shemas.ConsultCreate, id_doctor:int):
     models.Consulta.create(**consulta.dict(), 
                            medico= id_doctor, 
                            paciente= consulta.id_paciente)
+  
+def get_consulta_by_id_by_doctor(id_doctor:int, id_consulta:int):
+    consult = models.Consulta.get_or_none(
+        models.Consulta.id == id_consulta, models.Consulta.medico==id_doctor)
+    return consult
   
 #sectio patients-----------------------------------------------------------------------------------
 
@@ -45,8 +53,8 @@ def get_patients_total_visists_by_doctor(id_doctor:int):
 
 def get_patients_by_date_by_doctor(id_doctor:int, birthdate:datetime):
     query = models.Paciente.select(
-        models.Paciente).where(models.Paciente.fecha_nac==birthdate 
-                               and models.Paciente.medico== id_doctor)
+        models.Paciente).where(models.Paciente.fecha_nac==birthdate,
+                               models.Paciente.medico== id_doctor)
     patients:list = []
     for pat in query:
         patients.append(pat.__data__)

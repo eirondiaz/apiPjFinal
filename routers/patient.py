@@ -7,47 +7,42 @@ from fastapi import APIRouter
 from resources import strings
 from starlette import status
 from datetime import datetime
-
-TOKEN_KEY = ''
+from sql_app.shemas import ServerResponse
 
 router = APIRouter()
 
 #metodos de paciente
 
-#TODO
 @router.get(
     '/getBytotalVisits', 
     dependencies=[Depends(get_db)]
     )
-def get_total_visits(id_doctor):
-    #THIS CODE IS GOINT TO IMPLEMENT LATER
-    """ current_user:models.Medico = get_current_user_db_with_token(token)
-    patients = crud.get_patients_total_visists_by_doctor(current_user.id) """
-    patients:list = crud.get_patients_total_visists_by_doctor(id_doctor)
+def get_total_visits(token):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    patients:list = crud.get_patients_total_visists_by_doctor(current_user.id)
     if not patients:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=strings.NOT_PATIENTS
         )
-    return{'ok': True, 
-           'msg':strings.SUCCESS,
-          'patients':patients}
+    return ServerResponse(msg=strings.SUCCESS, data=patients)
     
-#TODO
-@router.get('/getByBirthdate/{patiente_birthdate}',dependencies=[Depends(get_db)])
-def get_patients_by_birthdate(id_doctor, patiente_birthdate:datetime):
-    #THIS CODE IS GOINT TO IMPLEMENT LATER
-    """ current_user:models.Medico = get_current_user_db_with_token(token)
-    patients = crud.get_patients_total_visists_by_doctor(current_user.id) """
-    patients:list = crud.get_patients_by_date_by_doctor(id_doctor, patiente_birthdate)
+    
+@router.get(
+    '/getByBirthdate/{patiente_birthdate}',
+    dependencies=[Depends(get_db)]
+    )
+def get_patients_by_birthdate(patiente_birthdate:datetime, token):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    patients:list = crud.get_patients_by_date_by_doctor(
+        current_user.id, patiente_birthdate
+        )
     if not patients:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=strings.NOT_PATIENTS
         )
-    return{'ok': True, 
-           'msg':strings.SUCCESS,
-          'patients':patients}
+    return ServerResponse(msg=strings.SUCCESS, data=patients)
 
 #---------------------------------------------------------------------------------------------------
 
@@ -55,19 +50,18 @@ def get_patients_by_birthdate(id_doctor, patiente_birthdate:datetime):
     '/create',
     dependencies=[Depends(get_db)]
     )
-def create_paciente(token: str, pac: shemas.Patient):
+def create_paciente(pac: shemas.Patient, token: str):
+    current_user:models.Medico = get_current_user_db_with_token(token)
     try:
-        data = jwt.decode(token, TOKEN_KEY)
-        try:
-            med = models.Medico.get(models.Medico.id == data['id'])
-            paciente = models.Paciente.create(**pac.dict(), medico = med)
-            return {'ok': True, 'msg': 'paciente registrado'}
-        except:
-            raise HTTPException(status_code = 400, detail='error')
-    except jwt.exceptions.DecodeError:
-            return {'ok': False, 'msg': 'token invalido'}
+        paciente = models.Paciente.create(
+            **pac.dict(), medico = current_user.id)
+        return ServerResponse(msg=strings.PATIENT_ADED)
+    except:
+        raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail= strings.PATIENT_NOT_CREATED 
+        )
             
-        
 #funciones de paciente
 #OBTENER TODOS LOS PACIENTES
 @router.get(
@@ -75,51 +69,68 @@ def create_paciente(token: str, pac: shemas.Patient):
     dependencies=[Depends(get_db)]
     )
 def get_all_patient(token: str):
-    try:
-        data = jwt.decode(token, TOKEN_KEY)
-        query = models.Paciente.select(models.Paciente).join(models.Medico).where(models.Medico.id == data['id'])
-        pacienteList = []
-        for pac in query:
-            pacienteList.append(pac.__data__)
-
-        return {'ok': True, 'pacientes': pacienteList}
-    except jwt.exceptions.DecodeError:
-        return {'ok': False, 'msg': 'token invalido'}
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    query = models.Paciente.select(models.Paciente).where(
+        models.Paciente.medico == current_user.id)
+    pacienteList = []
+    for pac in query:
+        pacienteList.append(pac.__data__)
+        if not pacienteList:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail=strings.NOT_PATIENTS)
+    return ServerResponse(data=pacienteList, msg=strings.SUCCESS)
+        
     
     
 #OBTENER PACIENTE POR ID
 @router.get(
-    '/{id}',
+    '/{id_patient}',
     dependencies=[Depends(get_db)]
     )
-def get_pac_by_id(id: int):
-    pac = models.Paciente.get_or_none(models.Paciente.id == id)
+def get_pac_by_id(id_patient: int, token):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    pac = models.Paciente.get_or_none(
+        models.Paciente.id == id_patient, 
+        models.Paciente.medico == current_user.id)
     if pac:
-        return {'ok': True, 'paciente': pac.__data__}
+        return ServerResponse(msg=strings.SUCCESS, data=pac.__data__ )
     else:
-        return {'ok': False, 'msg': 'no existe usuario'}
+        raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail=strings.NOT_PATIENT)
+
 
 #ELIMINAR PACIENTE
 @router.delete(
-    '/{id}',
+    '/{id_patient}',
     dependencies=[Depends(get_db)]
 )
-def delete_pac(id: str):
-    dela = models.Paciente.delete().where(models.Paciente.id == id).execute()
+def delete_pac(id_patient: str, token):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    dela = models.Paciente.delete().where(
+        models.Paciente.id == id_patient,
+        models.Paciente.medico == current_user.id).execute()
     if dela == 1:
-        return {'ok': True, 'msg': 'paciente eliminado'}
-    elif dela == 0:
-        return {'ok': False, 'msg': 'no existe paciente con ese id'}
+        return ServerResponse(msg=strings.PATIENT_DELETED)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail= strings.PATIENT_NOT_DELETED)
 
 #EDITAR PACIENTE
 @router.put(
-    '/{id}',
+    '/{id_patient}',
     dependencies=[Depends(get_db)]
 )
-def update_pac(id: str, pac: shemas.Patient):
-    updated = models.Paciente.update(**pac.dict()).where(models.Paciente.id == id).execute()
+def update_pac(id_patient: str, pac: shemas.Patient, token):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    updated = models.Paciente.update(**pac.dict()).where(
+        models.Paciente.id == id_patient, 
+        models.Paciente.medico ==current_user.id).execute()
     if updated == 1:
-        return {'ok': True, 'msg': 'paciente editado'}
-    elif updated == 0:
-        return {'ok': False, 'msg': 'error'}
-
+        return ServerResponse(msg=strings.PATIENT_UPDATED)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail= strings.PATIENT_NOT_UPDATED)
