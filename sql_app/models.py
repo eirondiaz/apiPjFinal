@@ -31,7 +31,7 @@ class Paciente(peewee.Model):
 class Consulta(peewee.Model):
     id = peewee.IntegerField(primary_key=True)
     nota = peewee.CharField()
-    monto = peewee.CharField()
+    monto = peewee.FloatField()
     fecha = peewee.DateTimeField(default=datetime.now())
     motivo = peewee.CharField()
     no_seguro = peewee.CharField()

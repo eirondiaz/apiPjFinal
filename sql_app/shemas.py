@@ -50,7 +50,7 @@ class Patient(PatientFechaNacimiento):
 
 class Consult(BaseModel):
     nota: Optional[str] = None
-    monto: Optional[str] = None
+    monto: Optional[float] = None
     motivo: Optional[str] = None
     no_seguro: Optional[str] = None
     diagnostico: Optional[str] = None
