@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional 
+from typing import Optional , List
 from datetime import datetime 
 
 class ServerResponse:
@@ -13,9 +13,15 @@ class ServerResponse:
     token:str
     data =''
 
+class MedicProfesionPais(BaseModel):
+    profesion:Optional[str] = None
+    pais:Optional[str] = None
 
 class MedicClave(BaseModel):
     clave: Optional[str] = None
+    
+class MedicCambiarClave(MedicClave):
+    nueva_clave:str
 
 class MedicCorreo(BaseModel):
     correo: Optional[str] = None
@@ -23,7 +29,7 @@ class MedicCorreo(BaseModel):
 class MedicNombre(BaseModel):
     nombre: Optional[str] = None
 
-class Medic(MedicClave, MedicCorreo, MedicNombre):
+class Medic(MedicClave, MedicCorreo, MedicNombre,MedicProfesionPais):
     pass
 
 class MedicNombreCorreo(MedicNombre, MedicCorreo):
@@ -47,6 +53,10 @@ class Patient(PatientFechaNacimiento):
     alergias: Optional[str] = None
     fecha_nac: Optional[datetime] = None
 
+
+class PatientId(BaseModel):
+    id_patient:int
+        
 
 class Consult(BaseModel):
     nota: Optional[str] = None

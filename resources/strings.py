@@ -26,4 +26,5 @@ CONSULT_NOT_FOUND:str = 'consult not found'
 CONSULT_UPDATED:str = 'consult updated'
 CONSULT_DELETED:str = 'consult deleted'
 LOGGED:str = 'logged'
+INCORRECT_PASSWORD:str = 'incorrect password'
 

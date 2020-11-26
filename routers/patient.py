@@ -8,6 +8,7 @@ from resources import strings
 from starlette import status
 from datetime import datetime
 from sql_app.shemas import ServerResponse
+from typing import List
 
 router = APIRouter()
 
@@ -43,6 +44,22 @@ def get_patients_by_birthdate(patiente_birthdate:datetime, token):
             detail=strings.NOT_PATIENTS
         )
     return ServerResponse(msg=strings.SUCCESS, data=patients)
+
+
+
+#ELIMINAR MULTIPLES PACIENTES
+@router.delete(
+    '/deleteMultiple',
+    dependencies=[Depends(get_db)]
+)
+def delete_multiple(patients: List[shemas.PatientId], token):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    try:
+        data =  crud.delete_multiple_patients_by_doctor(current_user.id, patients)
+    except: 
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT
+                            , detail=strings.ERROR)
+    return ServerResponse(msg=strings.SUCCESS)
 
 #---------------------------------------------------------------------------------------------------
 

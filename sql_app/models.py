@@ -6,6 +6,8 @@ from datetime import datetime
 class Medico(peewee.Model):
     id = peewee.IntegerField(primary_key=True)
     nombre = peewee.CharField()
+    profesion  = peewee.CharField()
+    pais = peewee.FixedCharField()
     correo = peewee.CharField(unique=True)
     clave = peewee.CharField()
 
