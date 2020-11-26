@@ -52,6 +52,17 @@ def get_closset_consults_by_doctor(id_doctor:int):
     for target_list in consults:
         consult_list.append(target_list.__data__)
     return consult_list
+
+
+def get_all_consults_by_doctor(id_doctor:int):
+    consults = models.Consulta.select(models.Consulta).where(
+        models.Consulta.medico == id_doctor
+        ).order_by(models.Consulta.fecha.desc())
+    consult_list:list = []
+    for target_list in consults:
+        consult_list.append(target_list.__data__)
+    return consult_list
+    pass
     
   
 #sectio patients-----------------------------------------------------------------------------------

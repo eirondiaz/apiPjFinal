@@ -85,7 +85,9 @@ def get_current_doctor_with_(token:str):
     current_user_consults:dict = current_user.__data__
     current_user_consults['consults'] = consults
     if not consults:
-        return ServerResponse(msg=strings.NOT_COLSULTS, data=current_user_consults)
+        return ServerResponse(ok=False, 
+                              msg=strings.NOT_COLSULTS, 
+                              data=current_user_consults)
     return ServerResponse(msg=strings.SUCCESS, data=current_user_consults)
 
 

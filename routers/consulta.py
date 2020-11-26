@@ -9,7 +9,7 @@ from resources import strings
 from sql_app.shemas import ServerResponse
 
 router = APIRouter()
-
+#TODO
 #OBTENER TODAS LAS CONSULTAS
 @router.get(
     '/',
@@ -17,14 +17,15 @@ router = APIRouter()
 )
 def get_all_consultas(token: str):
     current_user:models.Medico = get_current_user_db_with_token(token)
-    query = models.Consulta.get_or_none(models.Consulta.medico == current_user.id)
-    if not query:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-                      detail=strings.NOT_COLSULTS)
-    return ServerResponse(msg=strings.SUCCESS,data= query.__data__)
+    consults = crud.get_all_consults_by_doctor(current_user.id)
+    if not consults:
+        return ServerResponse(ok=False, 
+                              msg=strings.NOT_COLSULTS,
+                              data=[])
+    return ServerResponse(msg=strings.SUCCESS,
+                          data= consults)
 
-
+#TODO
 #OBTENER CONSULTA POR ID
 @router.get(
     '/{id}',
@@ -34,11 +35,12 @@ def get_consulta_by_id(id: int, token):
     current_user:models.Medico = get_current_user_db_with_token(token)
     consult = crud.get_consulta_by_id_by_doctor(current_user.id, id)
     if not consult:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail= strings.CONSULT_NOT_FOUND)
+        return ServerResponse(ok=False, 
+                              msg=strings.CONSULT_NOT_FOUND,
+                              data={})
     else:
-        return ServerResponse(msg=strings.SUCCESS, data=consult.__data__)
+        return ServerResponse(msg=strings.SUCCESS, 
+                              data=consult.__data__)
 
 
 #EDITAR CONSULTA
@@ -55,7 +57,7 @@ def edit_consulta(id_consult,con: shemas.Consult, token):
         return ServerResponse(msg=strings.CONSULT_UPDATED)
     else:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
+            status_code=status.HTTP_304_NOT_MODIFIED, 
             detail=strings.COULD_NOT_UPDATE)
 
 #ELIMINAR CONSULTA
