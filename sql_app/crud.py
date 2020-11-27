@@ -45,10 +45,20 @@ def create_consulta(consulta: shemas.ConsultCreate, id_doctor:int):
                            medico= id_doctor, 
                            paciente= consulta.id_paciente)
   
-def get_consulta_by_id_by_doctor(id_doctor:int, id_consulta:int):
-    consult = models.Consulta.get_or_none(
-        models.Consulta.id == id_consulta, models.Consulta.medico==id_doctor)
-    return consult
+
+def get_consulta_with_patient_by_id(id_doctor:int, id_consulta:int):
+    consult = models.Consulta.select(models.Consulta, models.Paciente).join(
+        models.Paciente).where(
+            models.Consulta.id==id_consulta,
+            models.Consulta.medico==id_doctor
+            )
+    i:int = 0
+    consult_list:list = []
+    for target_list in consult:
+        consult_list.append(target_list.__data__)
+        consult_list[i]['paciente'] = target_list.paciente.__data__
+        i = i +1
+    return consult_list
 
 
 def get_closset_consults_by_doctor(id_doctor:int):
@@ -71,13 +81,17 @@ def get_all_consults_by_doctor(id_doctor:int):
     return consult_list
     
 def get_all_consults_by_date_by_doctor(id_doctor:int, date:datetime):
-    consults = models.Consulta.select(models.Consulta).where(
+    consults = models.Consulta.select(models.Consulta, models.Paciente).join(
+        models.Paciente).where(
         models.Consulta.medico == id_doctor, models.Consulta.fecha == date
         ).order_by(models.Consulta.fecha.desc())
-    consult_list:list = []
+    consults_list:list = []
+    i:int = 0 
     for target_list in consults:
-        consult_list.append(target_list.__data__)
-    return consult_list
+        consults_list.append(target_list.__data__)
+        consults_list[i]['paciente'] = target_list.paciente.__data__
+        i = i +1
+    return consults_list
     
   
 #sectio patients-----------------------------------------------------------------------------------

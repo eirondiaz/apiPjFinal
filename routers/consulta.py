@@ -47,16 +47,16 @@ def get_all_consultas_by_date(token: str, date:datetime):
     '/{id}',
     dependencies=[Depends(get_db)]
 )
-def get_consulta_by_id(id: int, token):
+def get_consulta_with_patient_by_id(id: int, token):
     current_user:models.Medico = get_current_user_db_with_token(token)
-    consult = crud.get_consulta_by_id_by_doctor(current_user.id, id)
+    consult = crud.get_consulta_with_patient_by_id(current_user.id, id)
     if not consult:
         return ServerResponse(ok=False, 
                               msg=strings.CONSULT_NOT_FOUND,
                               data={})
     else:
         return ServerResponse(msg=strings.SUCCESS, 
-                              data=consult.__data__)
+                              data=consult)
 
 
 #EDITAR CONSULTA

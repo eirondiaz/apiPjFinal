@@ -36,13 +36,13 @@ def update_password(doctor:shemas.MedicCambiarClave,token:str):
     '/updateEmailName', 
     dependencies=[Depends(get_db)]
     )
-def update_password(doctor:shemas.MedicNombreCorreo,token:str):
+def update_email_name(doctor:shemas.MedicNombreCorreo,token:str):
     current_user: models.Medico  = get_current_user_db_with_token(token)
     if check_if_email_is_taken(doctor.correo):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail= strings.USER_ALRRADY_REGISTERED)
-    doctor_updated =  crud.update_password_doctor(current_user.id, doctor)
+    doctor_updated =  crud.update_email_name_doctor(current_user.id, doctor)
     if doctor_updated ==1:
         newToken = Token().encode(current_user.id,
                                   doctor.correo)
