@@ -7,6 +7,7 @@ from starlette import status
 from utils.token import Token
 from validations.authentication import check_if_email_is_taken
 from sql_app.shemas import ServerResponse
+from datetime import datetime
 
 
 router = APIRouter()
@@ -52,12 +53,12 @@ def update_password(doctor:shemas.MedicNombreCorreo,token:str):
            detail=strings.DOCTOR_NOT_UPDATED)
 
 @router.put(
-    '/updateProfesionAndContry', 
+    '/update', 
     dependencies=[Depends(get_db)]
     )
-def update_profesion_contry(doctor:shemas.MedicProfesionPais,token:str):
+def update(doctor:shemas.MedicUpdate,token:str):
     current_user: models.Medico  = get_current_user_db_with_token(token)
-    doctor_updated =  crud.update_contry_profesion_doctor(current_user.id, doctor)
+    doctor_updated =  crud.update_doctor(current_user.id, doctor)
     if doctor_updated ==1:
         return ServerResponse(msg=strings.DOCTOR_UPDATED)
     else: 
@@ -65,6 +66,21 @@ def update_profesion_contry(doctor:shemas.MedicProfesionPais,token:str):
            status_code=status.HTTP_304_NOT_MODIFIED,
            detail=strings.DOCTOR_NOT_UPDATED)
        
+@router.put(
+    '/updatePhoto', 
+    dependencies=[Depends(get_db)]
+    )
+def update_photo(doctor:shemas.MedicFoto,token:str):
+    current_user: models.Medico  = get_current_user_db_with_token(token)
+    doctor_updated =  crud.update_photo(current_user.id, doctor)
+    if doctor_updated ==1:
+        return ServerResponse(msg=strings.DOCTOR_UPDATED)
+    else: 
+       raise HTTPException(
+           status_code=status.HTTP_304_NOT_MODIFIED,
+           detail=strings.DOCTOR_NOT_UPDATED)
+
+
 
 @router.get(
     '/getCurrentDoctor',
@@ -72,7 +88,14 @@ def update_profesion_contry(doctor:shemas.MedicProfesionPais,token:str):
     )
 def get_current_doctor(token:str):
     current_user: models.Medico  = get_current_user_db_with_token(token)
-    return ServerResponse(msg=strings.SUCCESS, data=current_user.__data__)
+    current_user_dict:dict = {
+        'nombre':current_user.nombre,
+        'apellido':current_user.apellido,
+        'pais':current_user.pais,
+        'foto':current_user.foto,
+        'correo':current_user.correo
+    }
+    return ServerResponse(msg=strings.SUCCESS, data=current_user_dict)
 
 
 @router.get(
@@ -82,7 +105,14 @@ def get_current_doctor(token:str):
 def get_current_doctor_with_(token:str):
     current_user: models.Medico  = get_current_user_db_with_token(token)
     consults =  crud.get_closset_consults_by_doctor(current_user.id)
-    current_user_consults:dict = current_user.__data__
+    current_user_consults:dict = {
+        'nombre':current_user.nombre,
+        'apellido':current_user.apellido,
+        'pais':current_user.pais,
+        'foto':current_user.foto,
+        'correo':current_user.correo
+    }
+    current_user_consults['fecha_hoy'] = datetime.today()
     current_user_consults['consults'] = consults
     if not consults:
         return ServerResponse(ok=False, 

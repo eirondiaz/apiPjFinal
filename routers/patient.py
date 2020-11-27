@@ -14,7 +14,7 @@ router = APIRouter()
 
 #metodos de paciente
 #TODO
-@router.get(
+""" @router.get(
     '/getBytotalVisits', 
     dependencies=[Depends(get_db)]
     )
@@ -25,7 +25,7 @@ def get_total_visits(token):
         return ServerResponse(ok=False,
                               msg=strings.NOT_PATIENTS,
                               data=[])
-    return ServerResponse(msg=strings.SUCCESS, data=patients)
+    return ServerResponse(msg=strings.SUCCESS, data=patients) """
     
 #TODO
 @router.get(
@@ -80,7 +80,7 @@ def create_paciente(pac: shemas.Patient, token: str):
 #TODO    
 #funciones de paciente
 #OBTENER TODOS LOS PACIENTES
-@router.get(
+""" @router.get(
     '/patients',
     dependencies=[Depends(get_db)]
     )
@@ -97,7 +97,20 @@ def get_all_patient(token: str):
                               data=[])
     return ServerResponse(data=pacienteList, msg=strings.SUCCESS)
         
+     """
     
+@router.get(
+    '/patients',
+    dependencies=[Depends(get_db)]
+    )
+def get_all_patient_with_total_visits(token: str):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    patients:list = crud.get_patients_total_visists_by_doctor(current_user.id)
+    if not patients:
+        return ServerResponse(ok=False,
+                              msg=strings.NOT_PATIENTS,
+                              data=[])
+    return ServerResponse(msg=strings.SUCCESS, data=patients)
     
 #OBTENER PACIENTE POR ID
 @router.get(

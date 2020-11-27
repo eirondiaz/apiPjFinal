@@ -12,10 +12,18 @@ class ServerResponse:
     msg:str
     token:str
     data =''
-
-class MedicProfesionPais(BaseModel):
-    profesion:Optional[str] = None
+    
+class MedicApellido(BaseModel):
+    apellido:Optional[str] = None
+    
+class MedicPais(BaseModel):
     pais:Optional[str] = None
+    
+class MedicProfesion(BaseModel):
+    profesion:Optional[str] = None
+
+class MedicFoto(BaseModel):
+    foto:Optional[str] = None
 
 class MedicClave(BaseModel):
     clave: Optional[str] = None
@@ -28,8 +36,21 @@ class MedicCorreo(BaseModel):
     
 class MedicNombre(BaseModel):
     nombre: Optional[str] = None
+    
+                  
+class MedicUpdate(MedicNombre,
+                  MedicApellido, 
+                  MedicPais,
+                  MedicProfesion):
+    pass
 
-class Medic(MedicClave, MedicCorreo, MedicNombre,MedicProfesionPais):
+class Medic(MedicClave, 
+            MedicCorreo, 
+            MedicNombre,
+            MedicFoto,
+            MedicPais,
+            MedicProfesion,
+            MedicApellido):
     pass
 
 class MedicNombreCorreo(MedicNombre, MedicCorreo):

@@ -7,6 +7,7 @@ from starlette import status
 from utils.token import Token
 from resources import strings
 from sql_app.shemas import ServerResponse
+from datetime import datetime
 
 router = APIRouter()
 #TODO
@@ -24,6 +25,21 @@ def get_all_consultas(token: str):
                               data=[])
     return ServerResponse(msg=strings.SUCCESS,
                           data= consults)
+#TODO
+@router.get(
+    '/getByDate/{date}',
+    dependencies=[Depends(get_db)]
+)
+def get_all_consultas_by_date(token: str, date:datetime):
+    current_user:models.Medico = get_current_user_db_with_token(token)
+    consults = crud.get_all_consults_by_date_by_doctor(current_user.id,date)
+    if not consults:
+        return ServerResponse(ok=False, 
+                              msg=strings.NOT_COLSULTS,
+                              data=[])
+    return ServerResponse(msg=strings.SUCCESS,
+                          data= consults)
+
 
 #TODO
 #OBTENER CONSULTA POR ID

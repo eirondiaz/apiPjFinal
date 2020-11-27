@@ -27,10 +27,17 @@ def update_email_name_doctor(id:int, doctor_name_email:shemas.MedicNombreCorreo)
         **doctor_name_email.dict()).where(models.Medico.id == id).execute()
     return docotor_udated
 
-def update_contry_profesion_doctor(id:int,doctor_profesion_contry:shemas.MedicProfesionPais):
+def update_doctor(id:int,doctor_profesion_contry:shemas.MedicUpdate):
     docotor_udated =  models.Medico.update(
         **doctor_profesion_contry.dict()).where(models.Medico.id == id).execute()
     return docotor_udated
+
+def update_photo(id:int,doctor_photo:shemas.MedicFoto):
+    docotor_udated =  models.Medico.update(
+    **doctor_photo.dict()).where(models.Medico.id == id).execute()
+    return docotor_udated
+
+
 #sectio cosulta-----------------------------------------------------------------------------------
 
 def create_consulta(consulta: shemas.ConsultCreate, id_doctor:int):
@@ -62,7 +69,15 @@ def get_all_consults_by_doctor(id_doctor:int):
     for target_list in consults:
         consult_list.append(target_list.__data__)
     return consult_list
-    pass
+    
+def get_all_consults_by_date_by_doctor(id_doctor:int, date:datetime):
+    consults = models.Consulta.select(models.Consulta).where(
+        models.Consulta.medico == id_doctor, models.Consulta.fecha == date
+        ).order_by(models.Consulta.fecha.desc())
+    consult_list:list = []
+    for target_list in consults:
+        consult_list.append(target_list.__data__)
+    return consult_list
     
   
 #sectio patients-----------------------------------------------------------------------------------
