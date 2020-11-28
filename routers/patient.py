@@ -96,7 +96,6 @@ def get_all_patient(token: str):
                               msg=strings.NOT_PATIENTS,
                               data=[])
     return ServerResponse(data=pacienteList, msg=strings.SUCCESS)
-        
      """
     
 @router.get(
