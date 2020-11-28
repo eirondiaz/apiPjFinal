@@ -99,7 +99,7 @@ def get_all_consults_by_date_by_doctor(id_doctor:int, date:datetime):
 def get_patients_total_visists_by_doctor(id_doctor:int):
     query = models.Paciente.select(
     models.Paciente,models.Consulta.select(
-        fn.Count(models.Consulta).alias('_total_')).where(
+        fn.Count(models.Consulta.paciente).alias('_total_')).where(
             models.Consulta.paciente == models.Paciente.id)
     ).where(models.Paciente.medico ==id_doctor)
     patients:list = []
