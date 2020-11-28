@@ -92,6 +92,7 @@ def get_current_doctor(token:str):
         'nombre':current_user.nombre,
         'apellido':current_user.apellido,
         'pais':current_user.pais,
+        'profesion': current_user.profesion,
         'foto':current_user.foto,
         'correo':current_user.correo
     }
