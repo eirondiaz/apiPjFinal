@@ -21,6 +21,7 @@ class PeeweeConnectionState(peewee._ConnectionState):
 
 #"check_same_thread" is going to do delete it later
 
-db = peewee.SqliteDatabase(DATABASE_NAME, check_same_thread=False)
-#db = peewee.MySQLDatabase("db_a6ab16_finalpr", host="mysql5034.site4now.net", port=3306, user="a6ab16_finalpr", passwd="admin123456")
+#db = peewee.SqliteDatabase(DATABASE_NAME, check_same_thread=False)
+#db = peewee.MySQLDatabase("dkabara_profinal", host="104.37.172.56", port=3306, user="dkabara_profinal", passwd="pro123final")
+db = peewee.MySQLDatabase("db_a6ab16_finalpr", host="mysql5034.site4now.net", port=3306, user="a6ab16_finalpr", passwd="admin123456")
 db._state = PeeweeConnectionState()

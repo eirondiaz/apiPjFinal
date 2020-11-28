@@ -18,7 +18,7 @@ router = APIRouter()
     dependencies=[Depends(get_db)]
     )
 def update_password(doctor:shemas.MedicCambiarClave,token:str):
-    current_user: models.Medico  = get_current_user_db_with_token(token)
+    current_user: models.Medico = get_current_user_db_with_token(token)
     if  not current_user.clave == doctor.clave:
         raise HTTPException(
            status_code=status.HTTP_401_UNAUTHORIZED,

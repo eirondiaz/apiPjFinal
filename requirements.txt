@@ -1,0 +1,4 @@
+fastapi
+peewee
+pymysql
+pyjwt

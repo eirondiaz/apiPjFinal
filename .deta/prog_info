@@ -1,0 +1,1 @@
+{"id":"86c199a0-b9db-4417-9395-640d5c6cb935","space":1357,"runtime":"python3.7","name":"apiPjFinal","path":"n7pec0","project":"b0hl9rbd","account":"770806618286","region":"us-east-1","deps":["fastapi","peewee","pymysql","pyjwt"],"envs":null,"public":true,"log_level":"debug","cron":"","reload_deps":false}
