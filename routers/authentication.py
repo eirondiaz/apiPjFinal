@@ -16,7 +16,7 @@ router = APIRouter()
     '/register',
     dependencies=[Depends(get_db)]
     )
-def create_medico(med: shemas.Medic):
+def create_medico(med: shemas.MedicRegister):
     if check_if_email_is_taken(med.correo):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

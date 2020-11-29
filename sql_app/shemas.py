@@ -37,6 +37,8 @@ class MedicCorreo(BaseModel):
 class MedicNombre(BaseModel):
     nombre: Optional[str] = None
     
+class MedicRegister(MedicNombre,MedicCorreo, MedicClave):
+    pass
                   
 class MedicUpdate(MedicNombre,
                   MedicApellido, 
